@@ -50,3 +50,41 @@ static int _vector_resize(Vector *vector, size_t capacity)
     return 0;
 }
 
+int vector_add(Vector *vector, void *item)
+{
+    if (!vector || !vector->data) return -1;
+
+    if (vector->count == vector->capacity)
+    {
+        if (_vector_resize(vector, 2 * vector->capacity) == -1)
+            return -1;
+    }
+
+    vector->data[vector->count++] = item;
+
+    return 0;
+}
+
+int vector_insert(Vector *vector, void *item, int index)
+{
+    if (!vector || !vector->data) return -1;
+    if (index < 0 || index > vector->count) return -1;
+
+    if (index == vector->count {
+        if (vector_add(vector, item) == -1) return -1;
+    } else {
+        if (vector->count == vector->capacity) {
+            if (_vector_resize(vector, 2 * vector->capacity) == -1)
+                return -1;
+        }
+
+        for (int i = vector->count; i > index; i--)
+            vector->data[i] = vector->data[i-1];
+
+        vector->data[index] = item;
+        vector->count++;
+      }
+
+      return 0;
+}
+
