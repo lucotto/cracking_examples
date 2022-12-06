@@ -9,7 +9,7 @@ typedef struct
     size_t capacity;    // capacity of the vector
 } Vector;
 
-const size_t VECTOR_INIT_CAPACITY = 4;
+const size_t VECTOR_INIT_CAPACITY = 16;
 
 Vector *vector_create()
 {
@@ -39,7 +39,7 @@ void vector_free(Vector *vector)
     }
 }
 
-static int _vector_resize(Vector *vector, size_t capacity)
+static int resize(Vector *vector, size_t capacity)
 {
     void **data = realloc(vector->data, capacity * sizeof(void *));
     vector->capacity = capacity;
@@ -52,31 +52,31 @@ static int _vector_resize(Vector *vector, size_t capacity)
     return 0;
 }
 
-int vector_add(Vector *vector, void *item)
+int push(Vector *vector, void *item)
 {
     if (!vector || !vector->data) return -1;
 
     if (vector->count == vector->capacity)
     {
-        if (_vector_resize(vector, 2 * vector->capacity) == -1)
+        if (resize(vector, 2 * vector->capacity) == -1)
             return -1;
     }
 
     vector->data[vector->count++] = item;
-
+    printf("Successfully added item: [%d]\n", item);
     return 0;
 }
 
-int vector_insert(Vector *vector, void *item, int index)
+int insert(Vector *vector, void *item, int index)
 {
     if (!vector || !vector->data) return -1;
     if (index < 0 || index > vector->count) return -1;
 
     if (index == vector->count) {
-        if (vector_add(vector, item) == -1) return -1;
+        if (push(vector, item) == -1) return -1;
     } else {
         if (vector->count == vector->capacity) {
-            if (_vector_resize(vector, 2 * vector->capacity) == -1)
+            if (resize(vector, 2 * vector->capacity) == -1)
                 return -1;
         }
 
@@ -85,59 +85,90 @@ int vector_insert(Vector *vector, void *item, int index)
 
         vector->data[index] = item;
         vector->count++;
+        printf("Successfully added item [%d] at index %d\n", item, index);
       }
 
       return 0;
 }
 
-int vector_delete(Vector *vector, int index)
+int vdelete(Vector *vector, int index)
 {
     if (!vector || !vector->data) return -1;
     if (index < 0 || index >= vector->count) return -1;
 
     vector->count--;
+    // FIX THIS
+    printf("Successfully removed item [%d] at index %d\n", vector->data[index], index);
 
     for (int i = index; i < vector->count; i++)
         vector->data[i] = vector->data[i+1];
 
     if (vector->count == vector->capacity / 4 && vector->capacity > VECTOR_INIT_CAPACITY)
     {
-        if (_vector_resize(vector, vector->capacity / 2) == -1)
+        if (resize(vector, vector->capacity / 2) == -1)
             return -1;
     }
 }
 
+// MAIN WITH TESTS
+
 void vector_int_print(Vector *vector);
+int size(Vector *vector);
+int capacity(Vector *vector);
+int is_empty(Vector *vector);
+int prepend(Vector *vector, int item);
+int pop(Vector *vector);
 
 int main(void)
 {
-    int i;
-    Vector *vector = vector_create();
-    if (!vector) {
-        fprintf(stderr, "Cannot allocate vector.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    int even[3] = {2, 4, 6};
-    for (i = 0; i < 3; i++)
-        vector_add(vector, &even[i]);
-    vector_int_print(vector);
-
-    int odd[3] = {1, 3, 5};
-    vector_insert(vector, &odd[0], 0);
-    vector_insert(vector, &odd[1], 2);
-    vector_insert(vector, &odd[2], 4);
-    vector_int_print(vector);
-
-    for (i = 5; i > 2; i--)
-        vector_delete(vector, i);
-    vector_int_print(vector);
-
-    vector_free(vector);
+    Vector *vector = vector_create();   // init vector
+    size(vector);
+    capacity(vector);
+    is_empty(vector);
+    push(vector, 3);
+    insert(vector, 2, 0);
+    prepend(vector, 1);
+    size(vector);
+    pop(vector); // FIX POP IN VDELETE
+    size(vector);
 
     return EXIT_SUCCESS;
 }
 
+// print current number of items in vector
+int size(Vector *vector)
+{
+    printf("Current amount of items in vector: %d \n", vector->count);
+    return vector->count;   // return num of items (for func like is_empty)
+}
+
+// print current size of vector
+int capacity(Vector *vector)
+{
+    printf("Current size of vector: %d \n", vector->capacity);
+}
+
+// check if vector is empty
+int is_empty(Vector *vector)
+{
+    if (size(vector) == 0)
+        printf("This vector is currently empty\n");
+    else printf("This vector contains items\n");
+}
+
+// insert item at index 0
+int prepend(Vector *vector, int item)
+{
+    insert(vector, item, 0);
+}
+
+// remove item from end
+int pop(Vector *vector)
+{
+    vdelete(vector, (vector->count)-1);
+}
+
+// print vector as array []
 void vector_int_print(Vector *vector)
 {
     printf("[ ");
