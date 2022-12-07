@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// qual è il senso di return -1, 0? in caso di errore perché dovrei ritornare un valore o NULL piuttosto che un mex?
+// organizzazione codice anche in file (header ecc)
+
 typedef struct
 {
     void **data;        // information in the vector
@@ -97,7 +100,6 @@ int vdelete(Vector *vector, int index)
     if (index < 0 || index >= vector->count) return -1;
 
     vector->count--;
-    // FIX THIS
     printf("Successfully removed item [%d] at index %d\n", vector->data[index], index);
 
     for (int i = index; i < vector->count; i++)
@@ -118,19 +120,24 @@ int capacity(Vector *vector);
 int is_empty(Vector *vector);
 int prepend(Vector *vector, int item);
 int pop(Vector *vector);
+int vremove(Vector *vector, int item);
+int find(Vector *vector, int item);
 
 int main(void)
 {
     Vector *vector = vector_create();   // init vector
-    size(vector);
-    capacity(vector);
-    is_empty(vector);
-    push(vector, 3);
-    insert(vector, 2, 0);
-    prepend(vector, 1);
-    size(vector);
-    pop(vector); // FIX POP IN VDELETE
-    size(vector);
+    //size(vector);
+    //capacity(vector);
+    //is_empty(vector);
+    push(vector, 300);
+    insert(vector, 200, 0);
+    prepend(vector, 200);
+    //size(vector);
+    //vdelete(vector, 1);
+    //pop(vector);
+    //vremove(vector, 200);
+    //size(vector);
+    find(vector, 300);
 
     return EXIT_SUCCESS;
 }
@@ -151,7 +158,7 @@ int capacity(Vector *vector)
 // check if vector is empty
 int is_empty(Vector *vector)
 {
-    if (size(vector) == 0)
+    if (size(vector) == 0)                              // come faccio a skippare il print mantenendo size nell'if?
         printf("This vector is currently empty\n");
     else printf("This vector contains items\n");
 }
@@ -166,6 +173,25 @@ int prepend(Vector *vector, int item)
 int pop(Vector *vector)
 {
     vdelete(vector, (vector->count)-1);
+}
+
+// remove item by value
+int vremove(Vector *vector, int item)
+{
+    // immagino sia ottimizzabile senza loop coi pointer? sennò qual è il punto?
+    for (int i = 0; i < size(vector); i++)              // uguale a is_empty
+        if (vector->data[i] == item)
+            vdelete(vector, i--);
+        else printf("There's no item [%d] to be removed\n", item);
+}
+
+int find(Vector *vector, int item)
+{
+    // idem deve essere ottimizzabile o no?
+    for (int i = 0; i < size(vector); i++)
+        if (vector->data[i] == item)
+            printf("Found item [%d] at index %d\n", item, i);
+        else printf("Found no item [%d]\n", item);
 }
 
 // print vector as array []
