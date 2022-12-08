@@ -96,6 +96,79 @@ void pop_back()
 
 }
 
+// print front item
+void front()
+{
+    // print it directly
+    printf("Front item is: [%d]\n", head->data);
+}
+
+// print back item
+void back()
+{
+    struct node *ptr = head;
+
+    // iterate till SECOND TO LAST node
+    while (ptr->next != NULL)
+    {
+        ptr = ptr->next;
+    }
+
+    // last item is pointed to by second to last node's pointer
+    printf("Back item is: [%d]\n", ptr->data);
+}
+
+// return number of items in list
+void size()
+{
+    int count;
+    struct node *ptr = head;
+
+    while (ptr != NULL)
+    {
+        ptr = ptr->next;
+        count++;
+    }
+
+    printf("There are %d items in the list\n", count);
+}
+
+// return true if empty
+bool empty()
+{
+    if (head == NULL) {
+        printf("The list is empty\n");
+        return true;
+    }
+    else {
+        printf("The list is not empty\n");
+        return false;
+    }
+}
+
+// return item at index
+void value_at(int index)
+{
+    // count starts at -1 so if list is empty -1 is no valid index
+    int count = -1;
+    struct node *ptr = head;
+
+    // iterates till the node before the wanted index
+    if (empty()) // come posso chiamare empty senza il printf?
+        printf("There is no item at index [%d] (Empty list)\n", index);
+    while (count < index - 1)
+    {
+        ptr = ptr->next;
+        count++;
+    }
+    if (ptr == NULL)
+        printf("There are less than [%d] (index + 1) nodes in this list", index+1);
+    else
+        printf("The item at index [%d] is [%d]\n", index, ptr->data);
+
+
+}
+
 int main()
 {
     push_front(1);
@@ -104,8 +177,13 @@ int main()
     //pop_front();
     //printList();
     //push_back(100);
-    push_front(0);
-    printList();
-    pop_back();
-    printList();
+    //push_front(0);
+    //printList();
+    //pop_back();
+    //printList();
+    //front();
+    //back();
+    //size();
+    //empty();
+    value_at(2);
 }
