@@ -29,20 +29,20 @@ void printList()
     printf(" ]\n");
 }
 
-// insert link node at first location
+// insert new node at first location
 void push_front(int data)
 {
-    // create a link node
-    struct node *link = (struct node*)malloc(sizeof(struct node));
+    // create a new node
+    struct node *newnode = (struct node*)malloc(sizeof(struct node));
 
     // assign value to node
-    link->data = data;
+    newnode->data = data;
 
     // pointer of new node (next) points to old "second" node (starting at NULL)
-    link->next = head;
+    newnode->next = head;
 
     // head points to this node (which is the first, old was NULL)
-    head = link;
+    head = newnode;
 }
 
 void pop_front()    // devo liberare la memoria del nodo che poppo?
@@ -57,43 +57,36 @@ void pop_front()    // devo liberare la memoria del nodo che poppo?
     return temp;
 }
 
-// non funziona, forse servono puntatori doppi?
-void push_back(int data)
+
+// add element to end of linked list
+void push_back(struct node **ptr, int data)
 {
-    // declare new pointer with head address
-    struct node *ptr = head;
-    // allocate memory for new node
-    struct node *link = (struct node*)malloc(sizeof(struct node));
+    // allocate memory for newnode
+    struct node *newnode = (struct node*)malloc(sizeof(struct node)),
+    // declare temp pointer to iterate
+                *iter = *ptr;
 
-    // iterate till last node's pointer
-    while (ptr != NULL)
-    {
-        printf("%d - %d\n", ptr, ptr->data);
-        ptr = ptr->next;
-    }
+    // set newnode's data/pointer
+    newnode->data = data;
+    newnode->next = NULL;
 
-    // set new node's data to input
-    link->data = data;
-    // set new node's pointer to NULL
-    link->next = ptr;
-    // set old last pointer to new last node
-    ptr = link;
+    // iterate to old last node
+    while (iter->next != NULL)
+        iter = iter->next;
+    // point old last to new node
+    iter->next = newnode;
 }
 
-// non funziona DIO PORCO
-void pop_back()
+// remove last element of linked list
+void pop_back(struct node **ptr)
 {
-    struct node *ptr = head;
+    // declare temp pointer to iterate
+    struct node *iter = *ptr;
 
-    while (ptr->next != NULL)
-    {
-        ptr = ptr->next;
-    }
-
-    ptr = ptr->next;
-
-    printf("Successfully removed last node");
-
+    // iterate till SECOND TO LAST node
+    while (iter->next->next != NULL)
+        iter = iter->next;
+    iter->next = NULL;
 }
 
 // print front item
@@ -106,20 +99,20 @@ void front()
 // print back item
 void back()
 {
-    struct node *ptr = head;
+    struct node *iter = head;
 
-    // iterate till SECOND TO LAST node
-    while (ptr->next != NULL)
+    // iterate till last node
+    while (iter->next != NULL)
     {
-        ptr = ptr->next;
+        iter = iter->next;
     }
 
     // last item is pointed to by second to last node's pointer
-    printf("Back item is: [%d]\n", ptr->data);
+    printf("Back item is: [%d]\n", iter->data);
 }
 
 // return number of items in list
-void size()
+int size()
 {
     int count;
     struct node *ptr = head;
@@ -131,6 +124,7 @@ void size()
     }
 
     printf("There are %d items in the list\n", count);
+    return count;
 }
 
 // return true if empty
@@ -149,41 +143,75 @@ bool empty()
 // return item at index
 void value_at(int index)
 {
+    // if index is negative raise error
+    if (index < 0)
+    {
+        printf("Index has to be >= 0 to be valid");
+        return -1;
+    }
     // count starts at -1 so if list is empty -1 is no valid index
     int count = -1;
-    struct node *ptr = head;
+    struct node *iter = head;
 
     // iterates till the node before the wanted index
     if (empty()) // come posso chiamare empty senza il printf?
         printf("There is no item at index [%d] (Empty list)\n", index);
-    while (count < index - 1)
+    while (count <= index - 1)
     {
-        ptr = ptr->next;
+        iter = iter->next;
         count++;
     }
-    if (ptr == NULL)
-        printf("There are less than [%d] (index + 1) nodes in this list", index+1);
+    // if iteration came to the end of list
+    if (iter == NULL)
+        printf("There are less than [%d] (index + 1) nodes in this list\n", index+1);
+    // else print the data at given index
     else
-        printf("The item at index [%d] is [%d]\n", index, ptr->data);
+        printf("The item at index [%d] is [%d]\n", index, iter->data);
+}
 
+insert(struct node **ptr, int index, int data)
+{
+    if (index < 0)
+    {
+        printf("Index has to be >= 0 to be valid");
+        return -1;
+    }
+    else if (index == 0)
+        push_front(data);
+        return 0;
 
+    struct node *newnode = (struct node*)malloc(sizeof(struct node)),
+                *iter = *ptr;
+    int count = 1;
+
+    while (count < index)
+    {
+        iter = iter->next;
+        count++;
+    }
+
+    newnode->data = data;
+    newnode->next = iter->next;
+    iter->next = newnode;
 }
 
 int main()
 {
     push_front(1);
     push_front(2);
-    printList();
+    //printList();
     //pop_front();
     //printList();
-    //push_back(100);
+    push_back(&head, 100);
     //push_front(0);
-    //printList();
-    //pop_back();
+    printList();
+    //pop_back(&head);
     //printList();
     //front();
     //back();
     //size();
     //empty();
-    value_at(2);
+    //value_at(0);
+    insert(&head, 0, 5000);
+    printList();
 }
