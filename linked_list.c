@@ -169,7 +169,7 @@ void value_at(int index)
         printf("The item at index [%d] is [%d]\n", index, iter->data);
 }
 
-insert(struct node **ptr, int index, int data)
+int insert(struct node **ptr, int index, int data)
 {
     if (index < 0)
     {
@@ -177,8 +177,15 @@ insert(struct node **ptr, int index, int data)
         return -1;
     }
     else if (index == 0)
+    {
         push_front(data);
         return 0;
+    }
+    else if (index >= size())
+    {
+        push_back(&head, data);
+        return index;
+    }
 
     struct node *newnode = (struct node*)malloc(sizeof(struct node)),
                 *iter = *ptr;
@@ -195,6 +202,66 @@ insert(struct node **ptr, int index, int data)
     iter->next = newnode;
 }
 
+int pop_index(struct node **ptr, int index)
+{
+    if (index < 0)
+    {
+        printf("Index has to be >= 0 to be valid");
+        return -1;
+    }
+    else if (index == 0)
+    {
+        pop_front();
+        return 0;
+    }
+    else if (index >= (size()-1))
+    {
+        pop_back(&head);
+        return index;
+    }
+
+    struct node *iter = *ptr;
+    int count = 1;
+
+    while (count < index)
+    {
+        iter = iter->next;
+        count++;
+    }
+
+    iter->next = iter->next->next;
+}
+
+void remove_value(struct node **ptr, int data)
+{
+    struct node *iter = *ptr;
+    int index = 0;
+
+    if (iter->data == data)
+    {
+        pop_front();
+        printf("Successfully removed first node carrying [%d] value\n", data);
+        return 0;
+    }
+
+    while (iter->data != data)
+    {
+        iter = iter->next;
+        index++;
+        if (iter == NULL)
+            break; // non posso uscire direttamente dalla funzione qui?
+    }
+    if (iter == NULL)
+    {
+        printf("There's no node with [%d] value\n", data);
+        return 0;
+    }
+
+    pop_index(&head, index);
+    printf("Successfully removed first node carrying [%d] value\n", data);
+
+}
+
 int main()
 {
     push_front(1);
@@ -204,7 +271,7 @@ int main()
     //printList();
     push_back(&head, 100);
     //push_front(0);
-    printList();
+    //printList();
     //pop_back(&head);
     //printList();
     //front();
@@ -212,6 +279,9 @@ int main()
     //size();
     //empty();
     //value_at(0);
-    insert(&head, 0, 5000);
+    insert(&head, 3, 5000);
+    //printList();
+    //pop_index(&head, 4);
+    remove_value(&head, 2);
     printList();
 }
