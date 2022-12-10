@@ -11,7 +11,7 @@ struct node {
 
 // initialize two pointers, head and "current" being NULL
 struct node *head = NULL;
-struct node *current = NULL;
+//struct node *current = NULL;
 
 void printList()
 {
@@ -45,13 +45,17 @@ void push_front(int data)
     head = newnode;
 }
 
-void pop_front()    // devo liberare la memoria del nodo che poppo?
+struct node* pop_front()    // devo liberare la memoria del nodo che poppo?
 {
     // reference to first link
     struct node *temp = head;
 
     // mark next of first link (second link) as the new first
     head = head->next;
+
+    printf("%d\n", temp);
+    //------------> correggi void free(temp);
+    printf("%d\n", temp);
 
     // return deleted link
     return temp;
@@ -128,14 +132,15 @@ int size()
 }
 
 // return true if empty
+//--------------> if f viene lanciata da sola (oppure copia funzione per fare il lavoro a parte)
 bool empty()
 {
     if (head == NULL) {
-        printf("The list is empty\n");
+        // printf("The list is empty\n");
         return true;
     }
     else {
-        printf("The list is not empty\n");
+        // printf("The list is not empty\n");
         return false;
     }
 }
@@ -143,32 +148,34 @@ bool empty()
 // return item at index
 void value_at(int index)
 {
-    // if index is negative raise error
-    if (index < 0)
-    {
-        printf("Index has to be >= 0 to be valid");
-        return -1;
-    }
     // count starts at -1 so if list is empty -1 is no valid index
     int count = -1;
     struct node *iter = head;
 
+    // if index is negative raise error
+    if (index < 0)
+        printf("Index has to be >= 0 to be valid");
     // iterates till the node before the wanted index
-    if (empty()) // come posso chiamare empty senza il printf?
+    else if (empty())
         printf("There is no item at index [%d] (Empty list)\n", index);
-    while (count <= index - 1)
-    {
-        iter = iter->next;
-        count++;
-    }
-    // if iteration came to the end of list
-    if (iter == NULL)
-        printf("There are less than [%d] (index + 1) nodes in this list\n", index+1);
-    // else print the data at given index
     else
-        printf("The item at index [%d] is [%d]\n", index, iter->data);
+    {
+        // ----------> fix
+        while (count <= index - 1) // -1 <= -1
+        {
+            iter = iter->next;
+            count++;
+        }
+        // if iteration came to the end of list
+        if (iter == NULL)
+            printf("There are less than [%d] (index + 1) nodes in this list\n", index+1);
+        // else print the data at given index
+        else
+            printf("The item at index [%d] is [%d]\n", index, iter->data);
+    }
 }
 
+// commenta
 int insert(struct node **ptr, int index, int data)
 {
     if (index < 0)
@@ -202,6 +209,7 @@ int insert(struct node **ptr, int index, int data)
     iter->next = newnode;
 }
 
+// commenta
 int pop_index(struct node **ptr, int index)
 {
     if (index < 0)
@@ -232,6 +240,7 @@ int pop_index(struct node **ptr, int index)
     iter->next = iter->next->next;
 }
 
+// commenta
 void remove_value(struct node **ptr, int data)
 {
     struct node *iter = *ptr;
@@ -241,35 +250,38 @@ void remove_value(struct node **ptr, int data)
     {
         pop_front();
         printf("Successfully removed first node carrying [%d] value\n", data);
-        return 0;
     }
-
-    while (iter->data != data)
+    else
     {
-        iter = iter->next;
-        index++;
-        if (iter == NULL)
-            break; // non posso uscire direttamente dalla funzione qui?
+        for(;;)
+        {
+            if (iter == NULL)
+            {
+                printf("There is no such value in this list\n");
+                break;
+            }
+            else if (iter->data == data)
+            {
+                pop_index(&head, index);
+                printf("Successfully removed first node carrying [%d] value\n", data);
+                break;
+            }
+            iter = iter->next;
+            index++;
+        }
     }
-    if (iter == NULL)
-    {
-        printf("There's no node with [%d] value\n", data);
-        return 0;
-    }
-
-    pop_index(&head, index);
-    printf("Successfully removed first node carrying [%d] value\n", data);
-
 }
 
 int main()
 {
     push_front(1);
     push_front(2);
+    //pop_front();
+    printList();
     //printList();
     //pop_front();
     //printList();
-    push_back(&head, 100);
+    //push_back(&head, 100);
     //push_front(0);
     //printList();
     //pop_back(&head);
@@ -278,10 +290,10 @@ int main()
     //back();
     //size();
     //empty();
-    //value_at(0);
-    insert(&head, 3, 5000);
+    //value_at(1);
+    //insert(&head, 3, 5000);
     //printList();
     //pop_index(&head, 4);
-    remove_value(&head, 2);
+    remove_value(&head, 3);
     printList();
 }
