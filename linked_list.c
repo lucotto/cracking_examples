@@ -9,15 +9,15 @@ struct node {
     struct node *next;
 };
 
-// initialize two pointers, head and "current" being NULL
+// initialize head pointer
 struct node *head = NULL;
-//struct node *current = NULL;
 
+// print list
 void printList()
 {
     // declare new pointer with head address
     struct node *ptr = head;
-    printf("\n[ ");
+    printf("Linked list = [ ");
 
     // while pointer isn't last (which points to NULL)
     while(ptr != NULL)
@@ -27,6 +27,35 @@ void printList()
         ptr = ptr->next;
     }
     printf(" ]\n");
+}
+
+// return true if empty
+//--------------> if f viene lanciata da sola (oppure copia funzione per fare il lavoro a parte)
+bool empty()
+{
+    if (head == NULL) {
+        // printf("The list is empty\n");
+        return true;
+    }
+    else {
+        // printf("The list is not empty\n");
+        return false;
+    }
+}
+
+// return number of items in list
+int size()
+{
+    int count = 0;
+    struct node *ptr = head;
+
+    while (ptr != NULL)
+    {
+        ptr = ptr->next;
+        count++;
+    }
+
+    return count;
 }
 
 // insert new node at first location
@@ -43,22 +72,27 @@ void push_front(int data)
 
     // head points to this node (which is the first, old was NULL)
     head = newnode;
+
+    printf("Successfully added new node at front with [%d] value\n", data);
 }
 
-struct node* pop_front()    // devo liberare la memoria del nodo che poppo?
+int pop_front()
 {
     // reference to first link
     struct node *temp = head;
 
+    // store value to return it
+    int popped_value = head->data;
+
     // mark next of first link (second link) as the new first
     head = head->next;
 
-    printf("%d\n", temp);
-    //------------> correggi void free(temp);
-    printf("%d\n", temp);
+    // free allocated memory
+    free(temp);
 
-    // return deleted link
-    return temp;
+    // return deleted value
+    printf("Successfully removed front node with [%d] value\n", popped_value);
+    return popped_value;
 }
 
 
@@ -70,27 +104,41 @@ void push_back(struct node **ptr, int data)
     // declare temp pointer to iterate
                 *iter = *ptr;
 
-    // set newnode's data/pointer
-    newnode->data = data;
-    newnode->next = NULL;
+    if (empty())
+        push_front(data);
+    else
+    {
+        // set newnode's data/pointer
+        newnode->data = data;
+        newnode->next = NULL;
 
-    // iterate to old last node
-    while (iter->next != NULL)
-        iter = iter->next;
-    // point old last to new node
-    iter->next = newnode;
+        // iterate to old last node
+        while (iter->next != NULL)
+            iter = iter->next;
+        // point old last to new node
+        iter->next = newnode;
+    }
 }
 
 // remove last element of linked list
-void pop_back(struct node **ptr)
+int pop_back(struct node **ptr)
 {
     // declare temp pointer to iterate
     struct node *iter = *ptr;
 
-    // iterate till SECOND TO LAST node
-    while (iter->next->next != NULL)
-        iter = iter->next;
-    iter->next = NULL;
+    if (size() == 1)
+        pop_front();
+    else
+    {
+        // iterate till SECOND TO LAST node
+        while (iter->next->next != NULL)
+            iter = iter->next;
+        iter->next = NULL;
+        int popped_item = iter->data;
+        free(iter);
+        printf("Successfully removed node at back with [%d] value\n", popped_item);
+        return popped_item;
+    }
 }
 
 // print front item
@@ -115,41 +163,11 @@ void back()
     printf("Back item is: [%d]\n", iter->data);
 }
 
-// return number of items in list
-int size()
-{
-    int count;
-    struct node *ptr = head;
-
-    while (ptr != NULL)
-    {
-        ptr = ptr->next;
-        count++;
-    }
-
-    printf("There are %d items in the list\n", count);
-    return count;
-}
-
-// return true if empty
-//--------------> if f viene lanciata da sola (oppure copia funzione per fare il lavoro a parte)
-bool empty()
-{
-    if (head == NULL) {
-        // printf("The list is empty\n");
-        return true;
-    }
-    else {
-        // printf("The list is not empty\n");
-        return false;
-    }
-}
-
 // return item at index
-void value_at(int index)
+int value_at(int index)
 {
     // count starts at -1 so if list is empty -1 is no valid index
-    int count = -1;
+    int count = 1;
     struct node *iter = head;
 
     // if index is negative raise error
@@ -160,8 +178,8 @@ void value_at(int index)
         printf("There is no item at index [%d] (Empty list)\n", index);
     else
     {
-        // ----------> fix
-        while (count <= index - 1) // -1 <= -1
+        // iterate till index
+        while (count <= index)
         {
             iter = iter->next;
             count++;
@@ -171,33 +189,39 @@ void value_at(int index)
             printf("There are less than [%d] (index + 1) nodes in this list\n", index+1);
         // else print the data at given index
         else
+        {
             printf("The item at index [%d] is [%d]\n", index, iter->data);
+            return iter->data;
+        }
     }
 }
 
-// commenta
+// insert item at given index
 int insert(struct node **ptr, int index, int data)
 {
+    struct node *newnode = (struct node*)malloc(sizeof(struct node)),
+                *iter = *ptr;
+    int count = 1;
+
+    // if index is negative raise error
     if (index < 0)
     {
         printf("Index has to be >= 0 to be valid");
         return -1;
     }
+    // if index i 0 push front
     else if (index == 0)
     {
         push_front(data);
         return 0;
     }
+    // if index is greater than size push back
     else if (index >= size())
     {
         push_back(&head, data);
-        return index;
+        return 0;
     }
-
-    struct node *newnode = (struct node*)malloc(sizeof(struct node)),
-                *iter = *ptr;
-    int count = 1;
-
+    // for every other index iterate till that point and insert
     while (count < index)
     {
         iter = iter->next;
@@ -209,28 +233,31 @@ int insert(struct node **ptr, int index, int data)
     iter->next = newnode;
 }
 
-// commenta
+// pop node at given index
 int pop_index(struct node **ptr, int index)
 {
+    struct node *iter = *ptr;
+    int count = 1;
+
+    // negative index error
     if (index < 0)
     {
         printf("Index has to be >= 0 to be valid");
         return -1;
     }
+    // index 0 pop front
     else if (index == 0)
     {
         pop_front();
         return 0;
     }
+    // index "last" pop back
     else if (index >= (size()-1))
     {
         pop_back(&head);
         return index;
     }
-
-    struct node *iter = *ptr;
-    int count = 1;
-
+    // every other index iterate and pop
     while (count < index)
     {
         iter = iter->next;
@@ -238,19 +265,19 @@ int pop_index(struct node **ptr, int index)
     }
 
     iter->next = iter->next->next;
+    printf("Successfully removed node at index %d\n", index);
 }
 
-// commenta
-void remove_value(struct node **ptr, int data)
+// pop node by value
+void pop_value(struct node **ptr, int data)
 {
     struct node *iter = *ptr;
     int index = 0;
 
+    // if first node has data pop front
     if (iter->data == data)
-    {
         pop_front();
-        printf("Successfully removed first node carrying [%d] value\n", data);
-    }
+    // else iterate till you find it, error if you come to end
     else
     {
         for(;;)
@@ -263,7 +290,6 @@ void remove_value(struct node **ptr, int data)
             else if (iter->data == data)
             {
                 pop_index(&head, index);
-                printf("Successfully removed first node carrying [%d] value\n", data);
                 break;
             }
             iter = iter->next;
@@ -272,28 +298,63 @@ void remove_value(struct node **ptr, int data)
     }
 }
 
+// return value of node at position n starting from end
+int value_n_from_end(int n)
+{
+    int size_amount = size();
+
+    if (n < 0)
+        return -1;
+    else if (n > size_amount-1)
+        return -1;
+    else
+        value_at(size_amount - 1 - n);
+}
+
+// reverse
+int reverse()
+{
+    struct node *iter = head;
+
+    if (empty())
+        return 0;
+    else if (size() == 1)
+        return 0;
+    else
+    {
+        int values[size()-1];
+        for (int i = 0; i < size() - 1; i++)
+        {
+            if (i <= (size()-1) / 2)
+            {
+                values[i] = value_at(size() - 1 - i);
+                values[size()-1-i] = iter->data;
+            }
+            iter->data = values[i];
+            iter = iter->next;
+        }
+        iter->data = values[size()-1];
+        return 0;
+    }
+}
+
 int main()
 {
-    push_front(1);
-    push_front(2);
-    //pop_front();
     printList();
-    //printList();
-    //pop_front();
-    //printList();
-    //push_back(&head, 100);
-    //push_front(0);
-    //printList();
-    //pop_back(&head);
-    //printList();
-    //front();
-    //back();
-    //size();
-    //empty();
-    //value_at(1);
-    //insert(&head, 3, 5000);
-    //printList();
-    //pop_index(&head, 4);
-    remove_value(&head, 3);
-    printList();
+    /*
+    size
+    empty
+    value_at
+    push_front
+    pop_front
+    push_back
+    pop_back
+    front
+    back
+    insert
+    pop_index
+    pop_value
+    value_n_from_end
+    reverse
+    */
 }
