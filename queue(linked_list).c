@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+struct node *head = NULL;
+struct node *tail = NULL;
+
+void printList(){
+    struct node *iter = head;
+
+    printf("Queue: [");
+    while (iter != NULL){
+        printf("%d, ", iter->data);
+        iter = iter->next;
+    }
+    printf("]\n");
+}
+bool empty(){
+    if (head == NULL)
+        return true;
+    else return false;
+}
+
+void enqueue(int data){
+    struct node *newnode = (struct node *)malloc(sizeof(struct node));
+
+    if (empty()){
+        newnode->next = NULL;
+        head = tail = newnode;
+    }
+    else {
+        newnode->next = NULL;
+        tail->next = newnode;
+        tail = newnode;
+    }
+    newnode->data = data;
+}
+
+int dequeue(){
+    int popped;
+    struct node *temp = head;
+
+    if(empty())
+        return -1;
+    else if (temp = tail){
+        popped = temp->data;
+        head = tail = NULL;
+        free(temp);
+    }
+    else{
+        head = temp->next;
+        free(temp);
+    }
+    return popped;
+}
+
+void main(void){
+    printList();
+    enqueue(10);
+    printList();
+    enqueue(12);
+    printList();
+    dequeue();
+    printList();
+}
