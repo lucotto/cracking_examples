@@ -43,13 +43,13 @@ void enqueue(int data){
 }
 
 int dequeue(){
-    int popped;
     struct node *temp = head;
+    int popped;
 
     if(empty())
         return -1;
-    else if (temp = tail){
-        popped = temp->data;
+    else if (head == tail){
+        popped = head->data;
         head = tail = NULL;
         free(temp);
     }
@@ -62,10 +62,9 @@ int dequeue(){
 
 void main(void){
     printList();
-    enqueue(10);
-    printList();
-    enqueue(12);
-    printList();
-    dequeue();
-    printList();
+    /*
+    empty
+    enqueue(data)
+    dequeue
+    */
 }
