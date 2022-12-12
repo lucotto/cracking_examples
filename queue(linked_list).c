@@ -11,7 +11,7 @@ struct node {
 struct node *head = NULL;
 struct node *tail = NULL;
 
-void printList(){
+void printQueue(){
     struct node *iter = head;
 
     printf("Queue: [");
@@ -61,7 +61,7 @@ int dequeue(){
 }
 
 void main(void){
-    printList();
+    printQueue();
     /*
     empty
     enqueue(data)
