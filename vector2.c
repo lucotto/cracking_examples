@@ -1,9 +1,5 @@
-// https://alexandra-zaharia.github.io/posts/implementing-a-vector-in-c/
 #include <stdio.h>
 #include <stdlib.h>
-
-// qual è il senso di return -1, 0? in caso di errore perché dovrei ritornare un valore o NULL piuttosto che un mex?
-// organizzazione codice anche in file (header ecc)
 
 typedef struct
 {
@@ -178,7 +174,7 @@ int pop(Vector *vector)
 // remove item by value
 int vremove(Vector *vector, int item)
 {
-    // immagino sia ottimizzabile senza loop coi pointer? sennò qual è il punto?
+    // immagino sia ottimizzabile senza loop coi pointer? sennÃ² qual Ã¨ il punto?
     for (int i = 0; i < size(vector); i++)              // uguale a is_empty
         if (vector->data[i] == item)
             vdelete(vector, i--);
