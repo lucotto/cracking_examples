@@ -71,24 +71,93 @@ int get_height(struct node *root){
     return 1 + (left_height > right_height ? left_height : right_height);
 }
 
-int get_min(struct node *root){
-    while (root->left != NULL){
-        root = root->left;
+struct node *get_min(struct node *root){
+    struct node *temp = root;
+    while (temp->left != NULL){
+        temp = temp->left;
     }
-    printf("Min item is [%d]\n", root->data);
-    return root->data;
+    return temp;
 }
 
-int get_max(struct node *root){
-    while (root->right != NULL){
-        root = root->right;
+struct node *get_max(struct node *root){
+    struct node *temp = root;
+    while (temp->right != NULL){
+        temp = temp->right;
     }
-    printf("Max item is [%d]\n", root->data);
-    return root->data;
+    return temp;
 }
 
-void delete_value(struct node *root, int item){
+struct node *delete_value(struct node *root, int item){
+    if (root == NULL)
+        return root;
+    else if (item < root->data)
+        root->left = delete_value(root->left, item);
+    else if (item > root->data)
+        root->right = delete_value(root->right, item);
+    else{
+        if (root->left == NULL && root->right == NULL){
+            free(root);
+            root = NULL;
+        }
+        else if (root->left == NULL){
+            struct node *temp = root;
+            root = root->right;
+            free(temp);
+        }
+        else if (root->right == NULL){
+            struct node *temp = root;
+            root = root->left;
+            free(temp);
+        }
+        else{
+            struct node *temp = get_min(root->right);
+            root->data = temp->data;
+            root->right = delete_value(root->right, temp->data);
+        }
+    }
+    return root;
+}
 
+int get_successor(struct node *root, int item){
+    struct node *temp = root;
+    if (item >= get_max(root)->data)
+        return -1;
+    if ()
+}
+
+bool is_subtree_lesser(struct node *root, int item){
+    if (root == NULL)
+        return true;
+    if (root->data <= item
+        && is_subtree_lesser(root->left, item)
+        && is_subtree_lesser(root->right, item))
+
+        return true;
+    else
+        return false;
+}
+
+bool is_subtree_greater(struct node *root, int item){
+    if (root == NULL)
+        return true;
+    if (root->data > item
+        && is_subtree_greater(root->left, item)
+        && is_subtree_greater(root->right, item))
+
+        return true;
+    else
+        return false;
+}
+
+bool is_bst(struct node *root){
+    if (is_subtree_lesser(root->left, root->data)
+        && is_subtree_greater(root->right, root->data)
+        && is_bst(root->left)
+        && is_bst(root->right))
+
+        return true;
+    else
+        return false;
 }
 
 void print_values(struct node *root){
@@ -113,11 +182,13 @@ void main(void){
     insert(root, 49);
     print_values(root);
     printf("Count: %d\n", get_node_count(root));
+    printf("%d\n", is_bst(root));
     print_is_in_tree(root, 11);
     printf("Height: %d\n", get_height(root));
-    get_min(root);
-    get_max(root);
-    delete_value(root, 15);
+    printf("Min item is [%d]\n", get_min(root)->data);
+    printf("Max item is [%d]\n", get_max(root)->data);
+    print_values(root);
+    printf("\n%d\n", get_successor(root, 22));
     //delete_tree(root);
     //root = NULL;
     return 0;
